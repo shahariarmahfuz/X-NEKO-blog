@@ -2,22 +2,11 @@
 
 {% block content %}
 <style>
-    /* Custom styles for the Moderator Dashboard */
-    .dashboard-card {
-        background-color: white;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 25px;
-        margin-top: 10px;
-    }
-
     .dashboard-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--gray-light);
+        margin-bottom: 20px;
         flex-wrap: wrap;
         gap: 10px;
     }
@@ -37,69 +26,69 @@
         border-radius: 50px;
     }
 
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .post-card-container {
+        display: grid;
+        gap: 20px;
     }
 
-    .moderator-table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
+    .post-card {
+        background-color: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        /* কার্ডের ভেতরের কন্টেন্ট বাইরে যেন না যায় সেজন্য overflow: hidden দরকার ছিল, কিন্তু এখন এটি সমস্যার কারণ হওয়ায় তুলে দেওয়া হয়েছে। */
+        display: flex;
+        flex-direction: column;
+        transition: var(--transition);
+    }
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
     }
 
-    .moderator-table th, .moderator-table td {
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
         padding: 15px;
-        vertical-align: middle;
-        font-size: 15px;
-    }
-
-    .moderator-table thead {
-        background-color: #f8fafc; /* Using var(--light) */
-    }
-
-    .moderator-table th {
-        font-weight: 600;
-        color: var(--dark);
-        text-transform: uppercase;
-        font-size: 12px;
-        letter-spacing: 0.5px;
-    }
-
-    .moderator-table tbody tr {
+        background-color: #f8fafc;
         border-bottom: 1px solid var(--gray-light);
     }
 
-    .moderator-table tbody tr:last-child {
-        border-bottom: none;
-    }
-
-    .moderator-table .post-title {
-        font-weight: 600;
-        color: var(--dark);
-    }
-
-    .moderator-table .author-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .author-info img {
-        width: 32px;
-        height: 32px;
+    .author-pic img {
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         object-fit: cover;
     }
 
-    .actions-cell {
-        position: relative;
+    .author-details .author-name {
+        font-weight: 600;
+        color: var(--dark);
+        font-size: 15px;
+    }
+    .author-details .post-date {
+        font-size: 13px;
+        color: var(--gray);
     }
 
-    .action-buttons {
+    .card-body {
+        padding: 20px;
+    }
+    .card-body .post-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--dark);
+        line-height: 1.4;
+    }
+
+    .card-footer {
+        padding: 15px;
+        margin-top: auto; /* Pushes footer to the bottom */
+        border-top: 1px solid var(--gray-light);
         display: flex;
-        gap: 8px;
+        justify-content: flex-end;
         align-items: center;
+        gap: 10px;
     }
 
     .btn {
@@ -116,49 +105,27 @@
         transition: var(--transition);
     }
 
-    .btn-preview {
-        background-color: var(--gray-light);
-        color: var(--dark);
-        border: 1px solid #d1d5db;
-    }
-    .btn-preview:hover {
-        background-color: #e5e7eb;
-    }
-
-    .btn-approve {
-        background-color: #10b981; /* A nice green */
-        color: white;
-    }
-    .btn-approve:hover {
-        background-color: #059669;
-    }
-
-    .btn-reject {
-        background-color: var(--secondary);
-        color: white;
-    }
-    .btn-reject:hover {
-        background-color: #e11d48;
-    }
+    .btn-preview { background-color: var(--gray-light); color: var(--dark); border: 1px solid #d1d5db; }
+    .btn-preview:hover { background-color: #e5e7eb; }
+    .btn-approve { background-color: #10b981; color: white; }
+    .btn-approve:hover { background-color: #059669; }
+    .btn-reject { background-color: var(--secondary); color: white; }
+    .btn-reject:hover { background-color: #e11d48; }
 
     .reject-form-container {
         display: none;
-        position: absolute;
-        right: 0;
-        top: calc(100% + 5px);
+        position: fixed; /* Changed to fixed positioning */
         width: 280px;
         background: white;
         border: 1px solid var(--gray-light);
         border-radius: var(--radius);
         box-shadow: var(--shadow);
         padding: 15px;
-        z-index: 10;
+        z-index: 100; /* Increased z-index */
     }
-
     .reject-form-container.active {
         display: block;
     }
-
     .reject-form-container textarea {
         width: 100%;
         padding: 10px;
@@ -173,7 +140,6 @@
         border-color: var(--primary);
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
-
     .reject-form-container button {
         width: 100%;
         background-color: var(--primary);
@@ -182,9 +148,9 @@
     .no-posts {
         text-align: center;
         padding: 60px 20px;
-        background-color: #f8fafc;
-        border: 2px dashed var(--gray-light);
+        background-color: white;
         border-radius: var(--radius);
+        box-shadow: var(--shadow);
     }
     .no-posts i {
         font-size: 48px;
@@ -198,93 +164,119 @@
     }
 </style>
 
-<div class="dashboard-card">
-    <div class="dashboard-header">
-        <h1>Moderator Dashboard</h1>
-        {% if posts %}
-        <span class="post-count">{{ posts|length }} Pending</span>
-        {% endif %}
-    </div>
-
+<div class="dashboard-header">
+    <h1>Moderator Dashboard</h1>
     {% if posts %}
-    <div class="table-responsive">
-        <table class="moderator-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in posts %}
-                <tr>
-                    <td class="post-title">{{ post.title }}</td>
-                    <td>
-                        <div class="author-info">
-                            <img src="https://ui-avatars.com/api/?name={{ post.author.username[0] }}&background=random&color=fff" alt="{{ post.author.username }}">
-                            <span>{{ post.author.username }}</span>
-                        </div>
-                    </td>
-                    <td>{{ post.created_at.strftime('%d-%b-%Y') }}</td>
-                    <td class="actions-cell">
-                        <div class="action-buttons">
-                            <a href="{{ url_for('admin.preview_post', post_id=post.id) }}" class="btn btn-preview" target="_blank" title="Preview"><i class="fas fa-eye"></i></a>
-                            <a href="{{ url_for('admin.approve_post', post_id=post.id) }}" class="btn btn-approve" title="Approve"><i class="fas fa-check"></i> Approve</a>
-                            <button class="btn btn-reject reject-toggle-btn" title="Reject"><i class="fas fa-times"></i> Reject</button>
-                        </div>
-                        <div class="reject-form-container">
-                             <form action="{{ url_for('admin.reject_post', post_id=post.id) }}" method="post">
-                                <textarea name="reason" placeholder="Reason for rejection..." required rows="3"></textarea>
-                                <button type="submit" class="btn btn-primary">Confirm Rejection</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-        <div class="no-posts">
-            <i class="fas fa-check-circle"></i>
-            <p>Excellent work! There are no posts awaiting approval.</p>
-        </div>
+    <span class="post-count">{{ posts|length }} Pending</span>
     {% endif %}
 </div>
+
+<div class="post-card-container">
+    {% for post in posts %}
+    <div class="post-card">
+        <div class="card-header">
+            <div class="author-pic">
+                {% if post.author.profile_image_url %}
+                    <img src="{{ post.author.profile_image_url }}" alt="Profile Picture">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ post.author.username[0] }}&background=random&color=fff" alt="{{ post.author.username }}">
+                {% endif %}
+            </div>
+            <div class="author-details">
+                <div class="author-name">{{ post.author.username }}</div>
+                <div class="post-date">{{ post.created_at.strftime('%d %b, %Y') }}</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <h2 class="post-title">{{ post.title }}</h2>
+        </div>
+        <div class="card-footer">
+            <a href="{{ url_for('admin.preview_post', post_id=post.id) }}" class="btn btn-preview" target="_blank" title="Preview"><i class="fas fa-eye"></i></a>
+            <a href="{{ url_for('admin.approve_post', post_id=post.id) }}" class="btn btn-approve" title="Approve"><i class="fas fa-check"></i> Approve</a>
+            <button class="btn btn-reject reject-toggle-btn" data-form-id="form-{{ post.id }}" title="Reject"><i class="fas fa-times"></i> Reject</button>
+        </div>
+    </div>
+
+    <div class="reject-form-container" id="form-{{ post.id }}">
+         <form action="{{ url_for('admin.reject_post', post_id=post.id) }}" method="post">
+            <textarea name="reason" placeholder="Reason for rejection..." required rows="3"></textarea>
+            <button type="submit" class="btn btn-primary">Confirm Rejection</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not posts %}
+    <div class="no-posts">
+        <i class="fas fa-check-circle"></i>
+        <p>Excellent work! There are no posts awaiting approval.</p>
+    </div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const rejectButtons = document.querySelectorAll('.reject-toggle-btn');
+    const formContainers = document.querySelectorAll('.reject-form-container');
 
     rejectButtons.forEach(button => {
         button.addEventListener('click', function(event) {
-            event.stopPropagation(); // Prevent click from bubbling up to document
-            const formContainer = this.closest('.actions-cell').querySelector('.reject-form-container');
-            
-            // Close all other open forms
-            document.querySelectorAll('.reject-form-container.active').forEach(openForm => {
-                if (openForm !== formContainer) {
-                    openForm.classList.remove('active');
+            event.stopPropagation();
+
+            const formId = this.dataset.formId;
+            const targetForm = document.getElementById(formId);
+
+            // Close all other forms before opening a new one
+            formContainers.forEach(form => {
+                if (form.id !== formId && form.classList.contains('active')) {
+                    form.classList.remove('active');
                 }
             });
 
-            // Toggle the current form
-            formContainer.classList.toggle('active');
+            // Toggle the target form
+            const isActive = targetForm.classList.toggle('active');
+
+            if (isActive) {
+                // Calculate and set the position dynamically
+                const buttonRect = this.getBoundingClientRect();
+                const formHeight = targetForm.offsetHeight;
+                const formWidth = targetForm.offsetWidth;
+
+                let top, left;
+
+                // Center the form horizontally relative to the button
+                left = buttonRect.left + (buttonRect.width / 2) - (formWidth / 2);
+
+                // Prevent the form from going off-screen horizontally
+                if (left < 10) {
+                    left = 10;
+                }
+                if (left + formWidth > window.innerWidth) {
+                    left = window.innerWidth - formWidth - 10;
+                }
+
+                // Decide to place the form above or below the button
+                if (buttonRect.top > formHeight + 10) { // Enough space above
+                    top = buttonRect.top - formHeight - 10;
+                } else { // Not enough space, place below
+                    top = buttonRect.bottom + 10;
+                }
+
+                targetForm.style.top = `${top}px`;
+                targetForm.style.left = `${left}px`;
+            }
         });
     });
 
-    // Close forms if clicking outside
+    // Add a global click listener to close forms
     document.addEventListener('click', function(event) {
-        document.querySelectorAll('.reject-form-container.active').forEach(form => {
-            // Check if the click was outside the form and its toggle button
-            if (!form.contains(event.target) && !form.closest('.actions-cell').querySelector('.reject-toggle-btn').contains(event.target)) {
+        // If the click is not on a reject button or inside a form, close all forms
+        if (!event.target.closest('.reject-toggle-btn') && !event.target.closest('.reject-form-container')) {
+            formContainers.forEach(form => {
                 form.classList.remove('active');
-            }
-        });
+            });
+        }
     });
 });
 </script>
