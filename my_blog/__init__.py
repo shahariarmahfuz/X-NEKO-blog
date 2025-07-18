@@ -15,7 +15,7 @@ def create_app():
 
     # কনফিগারেশন
     app.config['SECRET_KEY'] = 'a-very-secret-key-that-should-be-changed'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://xneko_qqv7_user:895ROq5Yq0WMIDYZb4ygBhmjNKbJel6H@dpg-d1sgf4mmcj7s73dm37l0-a.singapore-postgres.render.com/xneko_qqv7'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://xneko_qqv7_user:895ROq5Yq0WMIDYZb4ygBhmjNKbJel6H@dpg-d1sgf4mmcj7s73dm37l0-a/xneko_qqv7'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
     app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
