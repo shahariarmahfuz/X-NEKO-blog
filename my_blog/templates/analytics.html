@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>অ্যানালিটিক্স (গত ৩০ দিন)</h1>
+    <table border="1" style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>তারিখ</th>
+                <th>নতুন ব্যবহারকারী</th>
+                <th>নতুন পোস্ট</th>
+                <th>নতুন কমেন্ট</th>
+                <th>নতুন লাইক</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in stats %}
+            <tr>
+                <td>{{ stat.date.strftime('%d %B, %Y') }}</td>
+                <td>{{ stat.new_users }}</td>
+                <td>{{ stat.new_posts }}</td>
+                <td>{{ stat.new_comments }}</td>
+                <td>{{ stat.new_likes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

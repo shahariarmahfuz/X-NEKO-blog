@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{# --- অন্যান্য পেজের মতো একই CSS এবং এই পেজের জন্য নতুন স্টাইল --- #}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    .container-new { max-width: 1200px; margin: 0 auto; padding: 0; }
+    .section-title { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--primary); display: inline-flex; align-items: center; position: relative; }
+    .section-title i { margin-right: 10px; color: var(--primary); background: rgba(99, 102, 241, 0.1); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .post-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .card-link { text-decoration: none; color: inherit; transition: all 0.3s ease; }
+    .card-link:hover { transform: translateY(-4px); }
+    .card { display: flex; background: #fff; border-radius: var(--radius, 10px); overflow: hidden; height: 95px; position: relative; transition: all 0.3s ease; box-shadow: var(--shadow); border: 1px solid var(--gray-light); }
+    .card:hover { border-color: var(--primary); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); }
+    .card img { width: 110px; flex-shrink: 0; aspect-ratio: 4 / 3; object-fit: cover; transition: all 0.3s ease; }
+    .card:hover img { transform: scale(1.05); }
+    .card-content { padding: 6px 12px; flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+    .card-content h4 { margin: 0 0 3px 0; font-size: 14px; line-height: 1.3; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dark); transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
+    .card:hover .card-content h4 { color: var(--primary); }
+    .card-content .description { margin: 0 0 5px 0; font-size: 12px; color: var(--gray); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; font-family: 'Inter', sans-serif; }
+    .meta-info { font-size: 11px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; font-family: 'Inter', sans-serif; }
+    .meta-info i { margin-right: 4px; font-size: 10px; color: var(--primary); }
+    hr.divider { margin: 40px 0; border: 0; height: 1px; background: linear-gradient(90deg, rgba(99, 102, 241, 0) 0%, var(--primary) 50%, rgba(99, 102, 241, 0) 100%); }
+
+    /* --- প্রোফাইল পেজের জন্য নতুন স্টাইল --- */
+    .profile-header { display: flex; align-items: center; gap: 30px; margin-bottom: 25px; padding: 25px; background: #fff; border-radius: var(--radius, 10px); box-shadow: var(--shadow); border: 1px solid var(--gray-light); flex-wrap: wrap; }
+    .profile-avatar img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .profile-info { flex: 1; }
+    .profile-info h1 { margin-top: 0; margin-bottom: 2px; font-family: 'Inter', sans-serif; font-size: 26px; color: var(--dark); }
+    .profile-info .username { font-size: 15px; color: var(--gray); margin-bottom: 15px; font-family: 'Inter', sans-serif; }
+    .profile-info .email { font-size: 14px; color: var(--gray); }
+    .profile-bio { margin-top: 15px; padding: 12px 15px; background: rgba(99, 102, 241, 0.05); border-left: 4px solid var(--primary); border-radius: 0 8px 8px 0; }
+    .profile-bio p { margin: 0; font-size: 14px; color: #555; line-height: 1.6; }
+    .profile-actions { margin-top: 20px; text-align: center; }
+
+    /* --- নতুন বাটন স্টাইল --- */
+    .btn { display: inline-block; padding: 10px 22px; border: 1px solid transparent; border-radius: var(--radius, 10px); text-decoration: none; font-weight: 600; transition: all 0.3s ease; font-family: 'Inter', sans-serif; cursor: pointer; }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35); background: var(--primary-dark); }
+</style>
+
+<div class="container-new">
+    <div class="content">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                {% if user.profile_image_url %}
+                    <img src="{{ user.profile_image_url }}" alt="প্রোফাইল ছবি">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ user.username[0] }}&size=120&background=random&color=fff&bold=true" alt="প্রোফাইল ছবি">
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.full_name or user.username }}</h1>
+                <p class="username">@{{ user.username }}</p>
+
+                {% if current_user == user %}
+                    <p class="email"><i class="fas fa-envelope" style="color:var(--primary); margin-right:5px;"></i>{{ user.email }}</p>
+                {% endif %}
+
+                {% if user.bio %}
+                    <div class="profile-bio">
+                        <p>{{ user.bio }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if current_user == user %}
+            <div style="text-align: left; margin-bottom: 25px;">
+                <a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary"><i class="fas fa-edit" style="margin-right: 8px;"></i> এডিট প্রোফাইল</a>
+            </div>
+        {% endif %}
+
+        <hr class="divider">
+
+        <h2 class="section-title"><i class="fas fa-newspaper"></i>{{ user.username }} এর সর্বশেষ পোস্ট</h2>
+
+        {% if recent_posts %}
+            <div class="post-list">
+                {% for post in recent_posts %}
+                <a href="{{ url_for('main.post', slug=post.slug) }}" class="card-link">
+                    <div class="card">
+                        <img src="{{ post.thumbnail_url or url_for('static', filename='images/default_thumbnail.png') }}" alt="{{ post.title }}">
+                        <div class="card-content">
+                            <h4>{{ post.title }}</h4>
+                            <p class="description">{{ post.content | striptags | truncate(80, True) }}</p>
+                            <div class="meta-info">
+                                <i class="fas fa-calendar-alt"></i>প্রকাশিত: {{ post.created_at.strftime('%d-%b-%Y') }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            <div class="profile-actions">
+                <a href="{{ url_for('main.user_posts', username=user.username) }}" class="btn btn-primary">সকল পোস্ট দেখুন</a>
+            </div>
+        {% else %}
+            <p style="text-align: center; margin-top: 30px; font-size: 16px; color: var(--gray);">এই ব্যবহারকারী এখনো কোনো পোস্ট করেননি।</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

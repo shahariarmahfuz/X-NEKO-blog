@@ -1,0 +1,239 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{# --- সার্চ পেজের মতো একই CSS স্টাইল এখানে যোগ করা হয়েছে --- #}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    .container-new {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    .section-title {
+        font-family: 'Inter', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 20px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--primary);
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .section-title i {
+        margin-right: 10px;
+        color: var(--primary);
+        background: rgba(99, 102, 241, 0.1);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .post-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .card-link {
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .card-link:hover {
+        transform: translateY(-4px);
+    }
+
+    .card {
+        display: flex;
+        background: #fff;
+        border-radius: var(--radius, 10px);
+        overflow: hidden;
+        height: 95px;
+        position: relative;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-light);
+    }
+
+    .card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .card img {
+        width: 110px;
+        flex-shrink: 0;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover img {
+        transform: scale(1.05);
+    }
+
+    .card-content {
+        padding: 6px 12px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .card-content h4 {
+        margin: 0 0 3px 0;
+        font-size: 14px;
+        line-height: 1.3;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--dark);
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .card:hover .card-content h4 {
+        color: var(--primary);
+    }
+
+    .card-content .description {
+        margin: 0 0 5px 0;
+        font-size: 12px;
+        color: var(--gray);
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .meta-info {
+        font-size: 11px;
+        color: var(--gray);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .meta-info i {
+        margin-right: 4px;
+        font-size: 10px;
+        color: var(--primary);
+    }
+
+    .meta-separator {
+        margin: 0 5px;
+        color: var(--gray-light);
+    }
+
+    .pagination {
+        text-align: center;
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pagination a, .pagination span {
+        font-family: 'Inter', sans-serif;
+        color: var(--primary);
+        padding: 8px 15px;
+        text-decoration: none;
+        border: 1px solid var(--gray-light);
+        border-radius: var(--radius, 10px);
+        transition: all 0.3s ease;
+        font-weight: 600;
+        min-width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pagination a:hover, .pagination a.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .pagination i {
+        font-size: 12px;
+    }
+
+    .pagination span {
+        background: #f0f0f0;
+        color: #aaa;
+        border-color: #e0e0e0;
+    }
+</style>
+
+<div class="container-new">
+    <div class="content">
+        {# --- ক্যাটাগরির শিরোনামটি নতুন স্টাইলে দেখানো হয়েছে --- #}
+        <h2 class="section-title">
+            <i class="fas fa-folder-open"></i> "{{ category.name }}" ক্যাটাগরির পোস্ট
+        </h2>
+
+        {% if posts_pagination.items %}
+            <div class="post-list">
+                {% for post in posts_pagination.items %}
+                <a href="{{ url_for('main.post', slug=post.slug) }}" class="card-link">
+                    <div class="card">
+                        <img src="{{ post.thumbnail_url }}" alt="{{ post.title }}">
+                        <div class="card-content">
+                            <h4>{{ post.title }}</h4>
+                            <p class="description">{{ post.content | striptags | truncate(80, True) }}</p>
+                            <div class="meta-info">
+                                <i class="fas fa-pen-alt"></i>By {{ post.author.username }}
+                                <span class="meta-separator">|</span>
+                                <i class="fas fa-calendar-alt"></i>{{ post.created_at.strftime('%d-%b-%Y') }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; margin-top: 30px; font-size: 16px; color: var(--gray);">এই ক্যাটাগরিতে কোনো পোস্ট পাওয়া যায়নি।</p>
+        {% endif %}
+
+        {# --- নতুন এবং উন্নত পেজিনেশন --- #}
+        {% if posts_pagination and posts_pagination.pages > 1 %}
+        <div class="pagination">
+            {% if posts_pagination.has_prev %}
+                {# --- পেজিনেশন লিঙ্কটি category_posts রাউটের জন্য পরিবর্তন করা হয়েছে --- #}
+                <a href="{{ url_for('main.category_posts', category_name=category.name, page=posts_pagination.prev_num) }}"><i class="fas fa-chevron-left"></i> Previous</a>
+            {% endif %}
+
+            {% for page_num in posts_pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    <a href="{{ url_for('main.category_posts', category_name=category.name, page=page_num) }}" class="{{ 'active' if page_num == posts_pagination.page else '' }}">{{ page_num }}</a>
+                {% else %}
+                    <span>...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if posts_pagination.has_next %}
+                <a href="{{ url_for('main.category_posts', category_name=category.name, page=posts_pagination.next_num) }}">Next <i class="fas fa-chevron-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

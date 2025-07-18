@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>অনুমোদনের অপেক্ষায় থাকা পোস্ট</h1>
+    {% if posts %}
+        <table border="1" style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="padding: 8px;">লেখক</th>
+                    <th style="padding: 8px;">শিরোনাম</th>
+                    <th style="padding: 8px;">পদক্ষেপ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                <tr>
+                    <td style="padding: 8px;">{{ post.author.username }}</td>
+                    <td style="padding: 8px;">{{ post.title }}</td>
+                    <td style="padding: 8px;">
+                        <a href="{{ url_for('admin.approve_post', post_id=post.id) }}">অনুমোদন</a> |
+                        <a href="{{ url_for('admin.preview_post', slug=post.slug) }}" target="_blank">দেখুন</a> |
+                        <details style="display:inline-block;">
+                            <summary style="cursor:pointer; color:blue; text-decoration:underline;">প্রত্যাখ্যান</summary>
+                            <form action="{{ url_for('admin.reject_post', post_id=post.id) }}" method="post" style="margin-top:5px; border:1px solid #ccc; padding:5px;">
+                                <label for="reason-{{post.id}}">কারণ:</label><br>
+                                <input type="text" id="reason-{{post.id}}" name="reason" placeholder="প্রত্যাখ্যানের কারণ (ঐচ্ছিক)" size="30"><br>
+                                <button type="submit">নিশ্চিত করুন</button>
+                            </form>
+                        </details>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>অনুমোদনের জন্য কোনো পোস্ট নেই।</p>
+    {% endif %}
+{% endblock %}

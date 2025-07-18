@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>রিভিউ করার জন্য রিপোর্টসমূহ</h1>
+
+    <h2>পোস্ট রিপোর্ট</h2>
+    {% if post_reports %}
+        <table border="1" style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>রিপোর্টার</th>
+                    <th>পোস্ট</th>
+                    <th>কারণ</th>
+                    <th>পদক্ষেপ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in post_reports %}
+                <tr>
+                    <td>{{ report.reporter.username }}</td>
+                    <td><a href="{{ url_for('admin.preview_post', post_id=report.post_id) }}" target="_blank">"{{ report.post.title }}"</a></td>
+                    <td>{{ report.reason }}</td>
+                    <td>
+                        <details style="margin-bottom: 5px;">
+                            <summary style="cursor:pointer;">ডিসমিস করুন</summary>
+                            <form action="{{ url_for('admin.dismiss_report', report_id=report.id) }}" method="post" style="padding:5px; border:1px solid #ccc;">
+                                <input type="text" name="reason" placeholder="কারণ (ঐচ্ছিক)" size="20"><br>
+                                <button type="submit">নিশ্চিত</button>
+                            </form>
+                        </details>
+
+                        <details>
+                            <summary style="cursor:pointer;">ডিলিট করুন</summary>
+                             <form action="{{ url_for('admin.delete_reported_content', report_id=report.id) }}" method="post" style="padding:5px; border:1px solid #ccc;">
+                                <input type="text" name="reason" placeholder="কারণ (আবশ্যক)" size="20" required><br>
+                                <button type="submit" onclick="return confirm('আপনি কি এই পোস্টটি ডিলিট করতে চান?')">নিশ্চিত</button>
+                            </form>
+                        </details>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>কোনো নতুন পোস্ট রিপোর্ট নেই।</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>কমেন্ট রিপোর্ট</h2>
+    {% if comment_reports %}
+        <table border="1" style="width:100%; border-collapse: collapse;">
+             <thead>
+                <tr>
+                    <th>রিপোর্টার</th>
+                    <th>কমেন্ট</th>
+                    <th>পোস্ট</th>
+                    <th>কারণ</th>
+                    <th>পদক্ষেপ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in comment_reports %}
+                <tr>
+                    <td>{{ report.reporter.username }}</td>
+                    <td>"{{ report.comment.text[:50] }}..."</td>
+                    <td><a href="{{ url_for('admin.preview_post', post_id=report.comment.post_id) }}#comment-{{ report.comment_id }}" target="_blank">{{ report.comment.post.title }}</a></td>
+                    <td>{{ report.reason }}</td>
+                    <td>
+                         <details style="margin-bottom: 5px;">
+                            <summary style="cursor:pointer;">ডিসমিস করুন</summary>
+                            <form action="{{ url_for('admin.dismiss_report', report_id=report.id) }}" method="post" style="padding:5px; border:1px solid #ccc;">
+                                <input type="text" name="reason" placeholder="কারণ (ঐচ্ছিক)" size="20"><br>
+                                <button type="submit">নিশ্চিত</button>
+                            </form>
+                        </details>
+
+                        <details>
+                            <summary style="cursor:pointer;">ডিলিট করুন</summary>
+                             <form action="{{ url_for('admin.delete_reported_content', report_id=report.id) }}" method="post" style="padding:5px; border:1px solid #ccc;">
+                                <input type="text" name="reason" placeholder="কারণ (আবশ্যক)" size="20" required><br>
+                                <button type="submit" onclick="return confirm('আপনি কি এই কমেন্টটি ডিলিট করতে চান?')">নিশ্চিত</button>
+                            </form>
+                        </details>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>কোনো নতুন কমেন্ট রিপোর্ট নেই।</p>
+    {% endif %}
+{% endblock %}

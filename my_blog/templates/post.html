@@ -1,0 +1,516 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="post-view-wrapper">
+
+    <style>
+        /* Hardcoded colors to avoid conflict with layout.html's :root variables */
+        :root {
+            --post-primary: #4361ee;
+            --post-primary-dark: #3a56d4;
+            --post-dark: #2b2d42;
+            --post-gray: #6c757d;
+            --post-gray-light: #e9ecef;
+            --post-radius: 8px;
+            --post-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .post-view-wrapper .post-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- Admin Preview & Post Header (unchanged) --- */
+        .post-view-wrapper .admin-preview-banner {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+            color: #856404; padding: 15px; border-radius: var(--post-radius);
+            margin-bottom: 30px; text-align: center; box-shadow: var(--post-shadow);
+            border: 1px solid #ffeeba;
+        }
+        .post-view-wrapper .admin-preview-banner h3 { margin: 0; font-size: 18px; font-weight: 600; }
+        .post-view-wrapper .post-header { text-align: center; margin-bottom: 40px; }
+        .post-view-wrapper .category-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .post-view-wrapper .category-pill { display: inline-block; background-color: var(--post-primary); color: white; padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .post-view-wrapper .category-pill:hover { background-color: var(--post-primary-dark); transform: translateY(-2px); }
+        .post-view-wrapper .post-title { font-size: 34px; font-weight: 800; color: var(--post-dark); line-height: 1.25; margin: 15px 0; }
+        .post-view-wrapper .author-meta-block { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .post-view-wrapper .author-profile-pic { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: var(--post-shadow); }
+        .post-view-wrapper .author-name { font-size: 17px; font-weight: 600; }
+        .post-view-wrapper .author-name a { color: var(--post-dark); text-decoration: none; }
+        .post-view-wrapper .author-name a:hover { color: var(--post-primary); }
+        .post-view-wrapper .admin-badge { background-color: var(--post-primary); color: white; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 12px; margin-left: 5px; vertical-align: middle; }
+        .post-view-wrapper .author-bio { font-size: 14px; color: #555; max-width: 600px; margin-top: 8px; text-align: center; }
+        .post-view-wrapper .tag-list { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .post-view-wrapper .tag-badge { background-color: #e9ecef; color: #333; padding: 5px 12px; border-radius: 15px; font-size: 12px; text-decoration: none; }
+
+        /* --- Main Post Content (unchanged) --- */
+        .post-view-wrapper .post-content {
+            line-height: 1.8; font-size: 17px; color: #334155; margin: 40px 0;
+            word-wrap: break-word;
+        }
+        .post-view-wrapper .post-content p { margin-bottom: 1.8em; }
+        .post-view-wrapper .post-content h1, .post-view-wrapper .post-content h2, .post-view-wrapper .post-content h3, .post-view-wrapper .post-content h4 {
+            margin-top: 2em; margin-bottom: 1em; color: var(--post-dark); line-height: 1.3;
+        }
+        .post-view-wrapper .post-content h2 { font-size: 28px; }
+        .post-view-wrapper .post-content h3 { font-size: 24px; }
+        .post-view-wrapper .post-content ul, .post-view-wrapper .post-content ol { padding-left: 30px; margin-bottom: 1.8em; }
+        .post-view-wrapper .post-content blockquote {
+            border-left: 4px solid var(--post-primary); padding: 15px 20px;
+            background-color: #f8fafc; margin: 25px 0;
+            border-radius: 0 var(--post-radius) var(--post-radius) 0;
+            font-style: italic; color: #4b5563;
+        }
+        .post-view-wrapper .post-content img {
+            max-width: 100%; height: auto; border-radius: var(--post-radius);
+            margin: 30px auto; display: block; box-shadow: var(--post-shadow);
+        }
+        .post-view-wrapper .post-content a { color: var(--post-primary); text-decoration: none; font-weight: 600; }
+        .post-view-wrapper .post-content a:hover { text-decoration: underline; }
+        .post-view-wrapper .post-content pre {
+            background-color: #f4f4f4; border: 1px solid #ddd; border-radius: var(--post-radius);
+            padding: 15px; margin: 20px 0; overflow-x: auto; font-size: 14px;
+        }
+        .post-view-wrapper .post-content code {
+            font-family: 'Courier New', Courier, monospace; background-color: #eef; color: #d63384;
+            padding: 2px 4px; border-radius: 4px;
+        }
+        .post-view-wrapper .post-content pre code { background: none; color: inherit; padding: 0; }
+        .post-view-wrapper .post-content table { width: 100%; border-collapse: collapse; margin: 25px 0; }
+        .post-view-wrapper .post-content th, .post-view-wrapper .post-content td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .post-view-wrapper .post-content th { background-color: #f2f2f2; font-weight: bold; }
+
+        /* --- Post Actions & Comments (unchanged) --- */
+        .post-view-wrapper .post-actions { display: flex; justify-content: center; align-items: center; gap: 15px; margin: 30px 0; padding: 15px 0; border-top: 1px solid #e9ecef; border-bottom: 1px solid #e9ecef; }
+        .post-view-wrapper .icon-button { display: flex; align-items: center; gap: 8px; background-color: #e9ecef; color: var(--post-dark); padding: 8px 18px; border: none; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 13px; text-decoration: none; transition: all 0.3s ease; }
+        .post-view-wrapper .icon-button:hover { background-color: #d1d5db; transform: translateY(-2px); }
+        .post-view-wrapper .icon-button.liked { background-color: var(--post-primary); color: white; }
+        .post-view-wrapper .icon-button i { font-size: 14px; }
+        .post-view-wrapper details { position: relative; }
+        .post-view-wrapper details > summary { list-style: none; cursor: pointer; }
+        .post-view-wrapper details > summary::-webkit-details-marker { display: none; }
+        .post-view-wrapper .details-form-container { position: absolute; margin-top: 8px; background: white; border: 1px solid #ddd; border-radius: var(--post-radius); padding: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); z-index: 10; width: 280px; left: 50%; transform: translateX(-50%); }
+        .post-view-wrapper .details-form-container h4 { margin: 0 0 5px 0; font-size: 15px; color: var(--post-dark); }
+        .post-view-wrapper .details-form-container p { font-size: 12px; color: var(--post-gray); margin: 0 0 10px 0; }
+        .post-view-wrapper .details-form-container textarea { width: 100%; padding: 10px; border: 1px solid #e9ecef; border-radius: var(--post-radius); margin-bottom: 10px; font-family: inherit; resize: vertical; font-size: 14px; }
+        .post-view-wrapper .details-form-container textarea:focus { border-color: var(--post-primary); outline: none; box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2); }
+        .post-view-wrapper .button { padding: 8px 15px; border: none; border-radius: var(--post-radius); cursor: pointer; font-weight: 600; transition: all 0.3s ease; text-decoration: none; display: inline-block; text-align: center; }
+        .post-view-wrapper .button:hover { transform: translateY(-2px); }
+        .post-view-wrapper .button-primary { background-color: var(--post-primary); color: white; width: 100%; }
+        .post-view-wrapper .button-primary:hover { background-color: var(--post-primary-dark); }
+        .post-view-wrapper .button-danger { background-color: #ef4444; color: white; }
+        .post-view-wrapper .button-danger:hover { background-color: #dc2626; }
+        .post-view-wrapper .comments-section { margin-top: 60px; }
+        .post-view-wrapper .comments-section > h3, .post-view-wrapper .comments-section > h4 { margin-bottom: 20px; color: var(--post-dark); border-top: 1px solid #e9ecef; padding-top: 30px; }
+        .post-view-wrapper .comment-form textarea { width: 100%; padding: 15px; border: 1px solid #e9ecef; border-radius: var(--post-radius); margin-bottom: 10px; font-family: inherit; resize: vertical; font-size: 16px; }
+        .post-view-wrapper .comment-form .button-primary { width: auto; padding: 10px 20px; font-size: 15px; }
+        .post-view-wrapper .comment-thread .comment { border-left: 2px solid #e9ecef; padding-left: 20px; margin-top: 25px; transition: all 0.3s ease; }
+        .post-view-wrapper .comment-thread .comment:hover { border-left-color: var(--post-primary); }
+        .post-view-wrapper .comment-replies { margin-left: 15px; padding-left: 15px; border-left: 2px solid #e0e0e0; }
+        .post-view-wrapper .comment-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .post-view-wrapper .profile-pic-small { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .post-view-wrapper .comment-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .post-view-wrapper .comment-actions .button { font-size: 12px; padding: 5px 10px; font-weight: 500; }
+        .post-view-wrapper .comment-actions .details-form-container { left: 0; transform: none; width: 250px; }
+
+        /* START: CORRECTED CODE SECTION */
+        .post-view-wrapper .related-posts-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid var(--post-gray-light);
+        }
+        .post-view-wrapper .related-posts-section h3 {
+            font-size: 22px;
+            margin-bottom: 25px;
+            color: var(--post-dark);
+        }
+        .post-view-wrapper .related-posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .post-view-wrapper .card-link {
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+        .post-view-wrapper .card-link:hover {
+            transform: translateY(-4px);
+        }
+        .post-view-wrapper .card {
+            display: flex;
+            /* align-items: center;  <- This line was removed */
+            background: #fff;
+            border-radius: var(--post-radius, 10px);
+            overflow: hidden;
+            height: 100px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: var(--post-shadow);
+            border: 1px solid var(--post-gray-light);
+        }
+        .post-view-wrapper .card:hover {
+            border-color: var(--post-primary);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        .post-view-wrapper .card img {
+            width: 90px;
+            height: 100%; /* <- Height changed to 100% */
+            flex-shrink: 0;
+            object-fit: cover;
+            transition: all 0.3s ease;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none; /* Override general img styles */
+        }
+        .post-view-wrapper .card:hover img {
+            transform: scale(1.05);
+        }
+        .post-view-wrapper .card-content {
+            padding: 8px 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            height: 100%;
+        }
+        .post-view-wrapper .card-content h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            line-height: 1.3;
+            font-weight: 600;
+            color: var(--post-dark);
+            transition: all 0.3s ease;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+        }
+        .post-view-wrapper .card:hover .card-content h4 {
+            color: var(--post-primary);
+        }
+        .post-view-wrapper .card-content .description {
+            margin: 0;
+            font-size: 12px;
+            color: var(--post-gray);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .post-view-wrapper .meta-info {
+            font-size: 11px;
+            color: var(--post-gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            margin-top: 4px;
+        }
+        .post-view-wrapper .meta-info i {
+            margin-right: 4px;
+            font-size: 10px;
+            color: var(--post-primary);
+        }
+        .post-view-wrapper .meta-info a {
+            color: var(--post-dark);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .post-view-wrapper .meta-info a:hover {
+            color: var(--post-primary);
+            text-decoration: underline;
+        }
+        .post-view-wrapper .meta-separator {
+            margin: 0 8px;
+            color: var(--post-gray-light);
+        }
+        /* END: CORRECTED CODE SECTION */
+
+        @media (max-width: 768px) {
+            .post-view-wrapper .post-title { font-size: 30px; }
+            .post-view-wrapper .post-content { font-size: 16px; }
+            .post-view-wrapper .post-content h2 { font-size: 24px; }
+            .post-view-wrapper .post-content h3 { font-size: 20px; }
+        }
+    </style>
+
+    <div class="post-container">
+
+        {% if is_preview %}
+        <div class="admin-preview-banner">
+            <h3>এডমিন প্রিভিউ</h3>
+        </div>
+        {% endif %}
+
+        <section class="post-header">
+            <div class="category-list">
+                {% for category in post.categories %}
+                    <a href="{{ url_for('main.category_posts', category_name=category.name) }}" class="category-pill">{{ category.name }}</a>
+                {% else %}
+                    <span class="category-pill" style="background-color: #6c757d;">Uncategorized</span>
+                {% endfor %}
+            </div>
+
+            <h1 class="post-title">{{ post.title }}</h1>
+
+            <div class="author-meta-block">
+                <a href="{{ url_for('main.profile', username=post.author.username) }}">
+                    {% if post.author.profile_image_url %}
+                        <img src="{{ post.author.profile_image_url }}" alt="{{ post.author.username }}" class="author-profile-pic">
+                    {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ post.author.username[0] }}&background=random&color=fff&size=80" alt="{{ post.author.username }}" class="author-profile-pic">
+                    {% endif %}
+                </a>
+                <div class="author-name">
+                    <a href="{{ url_for('main.profile', username=post.author.username) }}">{{ post.author.username }}</a>
+                    {% if post.author.role in ['Admin', 'Moderator'] %}
+                        <span class="admin-badge">✔ {{ post.author.role }}</span>
+                    {% endif %}
+                </div>
+
+                {% if post.author.bio %}
+                <p class="author-bio">{{ post.author.bio }}</p>
+                {% endif %}
+
+                <div class="tag-list">
+                    {% for tag in post.tags %}
+                        <a href="#" class="tag-badge">#{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <article class="post-content">
+            {{ post.content | safe }}
+        </article>
+
+        {% if not is_preview %}
+        <div class="post-actions">
+            {% if current_user.is_authenticated %}
+                <form id="like-form" action="{{ url_for('main.like_post', post_id=post.id) }}" method="post" style="margin:0;">
+                    <button type="submit" id="like-button" class="icon-button {% if post.likes.filter_by(user_id=current_user.id).first() %}liked{% endif %}">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span id="like-count">{{ post.likes.count() }}</span>
+                    </button>
+                </form>
+
+                {% if current_user != post.author %}
+                <details>
+                    <summary class="icon-button"><i class="fas fa-flag"></i> রিপোর্ট করুন</summary>
+                    <div class="details-form-container">
+                        <h4>পোস্ট রিপোর্ট করুন</h4>
+                        <p>এই পোস্টে কী সমস্যা? অনুগ্রহ করে বিস্তারিত জানান।</p>
+                        <form action="{{ url_for('main.submit_report') }}" method="post">
+                            <input type="hidden" name="post_id" value="{{ post.id }}">
+                            <textarea name="reason" placeholder="রিপোর্টের কারণ লিখুন..." required rows="3"></textarea>
+                            <button type="submit" class="button button-primary">রিপোর্ট সাবমিট করুন</button>
+                        </form>
+                    </div>
+                </details>
+                {% endif %}
+            {% else %}
+                <div class="icon-button">
+                    <i class="fas fa-thumbs-up"></i>
+                    <span id="like-count">{{ post.likes.count() }}</span>
+                </div>
+                <a href="{{ url_for('auth.login') }}" class="icon-button"><i class="fas fa-flag"></i> রিপোর্ট করুন</a>
+            {% endif %}
+        </div>
+
+        {% if related_popular_posts %}
+        <section class="related-posts-section">
+            <h3>এই ক্যাটাগরির জনপ্রিয় পোস্টসমূহ</h3>
+            <div class="related-posts-grid">
+                {% for rel_post in related_popular_posts %}
+                <a href="{{ url_for('main.post', slug=rel_post.slug) }}" class="card-link">
+                    <div class="card">
+                        <img src="{{ rel_post.thumbnail_url or url_for('static', filename='images/default_thumbnail.png') }}" alt="{{ rel_post.title }}">
+                        <div class="card-content">
+                            <div>
+                                <h4>{{ rel_post.title }}</h4>
+                                {% if rel_post.content %}
+                                <p class="description">
+                                    {{ rel_post.content | striptags | truncate(80, True) }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="meta-info">
+                                <i class="fas fa-pen-alt"></i> By&nbsp;<a href="{{ url_for('main.profile', username=rel_post.author.username) }}">{{ rel_post.author.username }}</a>
+                                <span class="meta-separator">|</span>
+                                <i class="fas fa-calendar-alt"></i> {{ rel_post.created_at.strftime('%d-%b-%Y') }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="comments-section">
+            <h3>মন্তব্যসমূহ</h3>
+            {% if current_user.is_authenticated %}
+                {% if not current_user.is_banned %}
+                    <h4>নতুন মন্তব্য করুন</h4>
+                    <form id="comment-form" action="{{ url_for('main.add_comment', post_id=post.id) }}" method="post" class="comment-form">
+                        <textarea name="comment_text" rows="3" required placeholder="আপনার মন্তব্য লিখুন..."></textarea>
+                        <button type="submit" class="button button-primary">মন্তব্য পোস্ট করুন</button>
+                    </form>
+                {% else %}
+                    <div class="banned-notice">
+                        <p>আপনাকে মন্তব্য করা থেকে ব্যান করা হয়েছে।</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <p>অনুগ্রহ করে মন্তব্য করার জন্য <a href="{{ url_for('auth.login') }}">লগইন</a> করুন।</p>
+            {% endif %}
+
+            <h4>সকল মন্তব্য ({{ comments | length }})</h4>
+            <div id="comment-thread" class="comment-thread">
+            {% for comment in comments recursive %}
+                <div class="comment" id="comment-{{ comment.id }}">
+                    <div class="comment-header">
+                        <a href="{{ url_for('main.profile', username=comment.commenter.username) }}">
+                        {% if comment.commenter.profile_image_url %}
+                            <img src="{{ comment.commenter.profile_image_url }}" alt="{{ comment.commenter.username }}" class="profile-pic-small">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ comment.commenter.username[0] | urlencode }}&background=random&color=fff&size=32" alt="{{ comment.commenter.username }}" class="profile-pic-small">
+                        {% endif %}
+                        </a>
+                        <strong>{{ comment.commenter.username }}</strong>
+                        {% if comment.commenter.role in ['Admin', 'Moderator'] %}
+                            <span class="admin-badge" style="font-size: 9px; padding: 2px 6px;">✔ {{ comment.commenter.role }}</span>
+                        {% endif %}
+                        <small style="color:var(--gray)">({{ comment.created_at.strftime('%d-%b-%Y') }})</small>
+                    </div>
+                    <p>{{ comment.text }}</p>
+
+                    {% if current_user.is_authenticated %}
+                    <div class="comment-actions">
+                        {% if not current_user.is_banned %}
+                        <details>
+                            <summary class="button">উত্তর দিন</summary>
+                                <div class="details-form-container">
+                                    <h4>উত্তর দিন</h4>
+                                    <form action="{{ url_for('main.add_comment', post_id=post.id) }}" method="post">
+                                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                        <textarea name="comment_text" rows="2" required placeholder="রিপ্লাই লিখুন..."></textarea>
+                                        <button type="submit" class="button button-primary">পোস্ট করুন</button>
+                                    </form>
+                                </div>
+                        </details>
+                        {% endif %}
+
+                        {% if current_user != comment.commenter %}
+                        <details>
+                            <summary class="button">রিপোর্ট</summary>
+                                <div class="details-form-container">
+                                    <h4>মন্তব্য রিপোর্ট করুন</h4>
+                                    <form action="{{ url_for('main.submit_report') }}" method="post">
+                                        <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                                        <textarea name="reason" placeholder="রিপোর্টের কারণ..." required rows="2"></textarea>
+                                        <button type="submit" class="button button-primary">সাবমিট</button>
+                                    </form>
+                                </div>
+                        </details>
+                        {% endif %}
+
+                        {% if current_user.role == 'Admin' %}
+                        <form action="{{ url_for('admin.delete_comment', comment_id=comment.id) }}" method="post" onsubmit="return confirm('আপনি কি এই মন্তব্যটি মুছে ফেলতে চান?')">
+                            <button type="submit" class="button button-danger">মুছুন</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if comment.replies %}
+                    <div class="comment-replies">
+                        {{ loop(comment.replies.filter_by(is_hidden_by_ban=False).order_by('created_at')) }}
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <p>এখনো কোনো মন্তব্য করা হয়নি। প্রথম মন্তব্যটি আপনি করুন!</p>
+            {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // AJAX Like button functionality
+    const likeForm = document.getElementById('like-form');
+    if (likeForm) {
+        likeForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const likeButton = document.getElementById('like-button');
+            const likeCountSpan = document.getElementById('like-count');
+            const formURL = likeForm.action;
+
+            fetch(formURL, {
+                method: 'POST',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    likeCountSpan.textContent = data.likes_count;
+                    if (data.user_liked) {
+                        likeButton.classList.add('liked');
+                        likeButton.style.transform = 'scale(1.15)';
+                        setTimeout(() => {
+                            likeButton.style.transform = '';
+                        }, 200);
+                    } else {
+                        likeButton.classList.remove('liked');
+                    }
+                } else {
+                    if(data.message) {
+                        alert(data.message);
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
+
+    // Ensure only one <details> pop-up is open at a time
+    const allDetails = document.querySelectorAll('.post-view-wrapper details');
+    allDetails.forEach(detail => {
+        detail.addEventListener('toggle', event => {
+            if (detail.open) {
+                allDetails.forEach(otherDetail => {
+                    if (otherDetail !== detail) {
+                        otherDetail.open = false;
+                    }
+                });
+            }
+        });
+    });
+
+    // Close <details> when clicking outside
+    document.addEventListener('click', function(event) {
+        allDetails.forEach(detail => {
+            const isClickInside = detail.contains(event.target);
+            if (detail.open && !isClickInside) {
+                detail.open = false;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+    /* Form Container Styles */
+    .form-container {
+        background-color: #ffffff;
+        padding: 30px 40px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        max-width: 700px;
+        margin: 20px auto;
+        border-top: 5px solid var(--primary);
+    }
+
+    .form-container h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 25px;
+        text-align: center;
+        border-bottom: 2px solid var(--gray-light);
+        padding-bottom: 15px;
+    }
+
+    /* Form Group Styles */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 8px;
+    }
+
+    /* General Form Control Styles */
+    .form-control,
+    .form-control-file {
+        width: 100%;
+        padding: 12px 18px;
+        font-size: 16px;
+        border: 2px solid var(--gray-light);
+        border-radius: var(--radius);
+        transition: var(--transition);
+        background-color: #f8fafc;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Textarea Specific Styles */
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    /* File Input Specific Styles */
+    .form-control-file {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .form-control-file:hover {
+        background-color: var(--gray-light);
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--gray);
+    }
+
+    .form-group img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-top: 8px;
+        object-fit: cover;
+        border: 3px solid var(--gray-light);
+    }
+
+    /* Button Styles */
+    .button {
+        display: inline-block;
+        padding: 14px 30px;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        transition: var(--transition);
+        width: 100%; /* Make button full width */
+    }
+
+    .button-primary {
+        background: var(--gradient);
+        color: white;
+    }
+
+    .button-primary:hover {
+        opacity: 0.9;
+        box-shadow: var(--shadow);
+    }
+
+</style>
+
+<div class="form-container">
+    <h2>প্রোফাইল এডিট করুন</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="full_name">পুরো নাম</label>
+            <input type="text" id="full_name" name="full_name" class="form-control" value="{{ user.full_name or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="username">ইউজারনেম</label>
+            <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">ইমেইল</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="bio">আপনার বায়ো</label>
+            <textarea id="bio" name="bio" class="form-control" rows="4" placeholder="আপনার সম্পর্কে কিছু লিখুন...">{{ user.bio or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="password">নতুন পাসওয়ার্ড (পরিবর্তন করতে না চাইলে খালি রাখুন)</label>
+            <input type="password" id="password" name="password" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="profile_pic">প্রোফাইল ছবি পরিবর্তন করুন</label>
+            <input type="file" id="profile_pic" name="profile_pic" class="form-control-file" accept="image/*">
+            {% if user.profile_image_url %}
+                <small>বর্তমান ছবি:</small>
+                <img src="{{ user.profile_image_url }}" alt="Profile Picture">
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="button button-primary">আপডেট করুন</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

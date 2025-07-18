@@ -1,0 +1,130 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+    /* Form Wrapper Styles */
+    .form-wrapper {
+        max-width: 480px; /* Slightly wider for more fields */
+        margin: 40px auto;
+        padding: 30px 40px;
+        background: #ffffff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border-top: 5px solid var(--secondary); /* Using secondary color for variety */
+        text-align: center;
+    }
+
+    .form-wrapper h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: var(--dark);
+    }
+
+    /* Form Group for better spacing */
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left; /* Align labels and inputs to the left */
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--dark);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"] {
+        width: 100%;
+        padding: 12px 18px;
+        font-size: 16px;
+        border: 2px solid var(--gray-light);
+        border-radius: var(--radius);
+        transition: var(--transition);
+        background-color: var(--light);
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group input[type="email"]:focus,
+    .form-group input[type="password"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Button Styles */
+    .button {
+        display: block;
+        width: 100%;
+        padding: 14px 20px;
+        border: none;
+        background: var(--gradient);
+        color: white;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .button:hover {
+        opacity: 0.9;
+        box-shadow: var(--shadow);
+    }
+
+    /* Bottom Link Style */
+    .bottom-link {
+        margin-top: 25px;
+        font-size: 15px;
+        color: var(--gray);
+    }
+
+    .bottom-link a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .bottom-link a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+</style>
+
+<div class="form-wrapper">
+    <h1>Create Your Account</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit" class="button">Register</button>
+    </form>
+
+    <div class="bottom-link">
+        Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
+    </div>
+</div>
+{% endblock %}

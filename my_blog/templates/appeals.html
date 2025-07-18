@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>ব্যান আপিলসমূহ</h1>
+    {% if appeals %}
+        <table border="1" style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>ব্যবহারকারী</th>
+                    <th>ব্যানের কারণ</th>
+                    <th>আপিলের কারণ</th>
+                    <th>পদক্ষেপ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appeal in appeals %}
+                <tr>
+                    <td>{{ appeal.appellant.username }}</td>
+                    <td>{{ appeal.appellant.ban_reason }}</td>
+                    <td>{{ appeal.reason }}</td>
+                    <td>
+                        <form action="{{ url_for('admin.unban_user', user_id=appeal.user_id) }}" method="post">
+                            <button type="submit" onclick="return confirm('আপনি কি এই ব্যবহারকারীকে আনব্যান করতে চান?')">আনব্যান করুন</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>কোনো নতুন আপিল নেই।</p>
+    {% endif %}
+{% endblock %}

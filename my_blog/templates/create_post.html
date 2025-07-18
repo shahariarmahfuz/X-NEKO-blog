@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>{% if post %}পোস্ট এডিট করুন{% else %}নতুন পোস্ট তৈরি করুন{% endif %}</h1>
+    <form method="POST">
+        <label for="title">শিরোনাম:</label><br>
+        <input type="text" id="title" name="title" size="50" value="{{ post.title if post else '' }}" required><br><br>
+
+        <label for="content">বিস্তারিত:</label><br>
+        <textarea id="content" name="content" rows="10" cols="50" required>{{ post.content if post else '' }}</textarea><br><br>
+
+        <h4>ক্যাটাগরি নির্বাচন করুন:</h4>
+        {% for category in categories %}
+            <input type="checkbox" name="categories" value="{{ category.id }}" id="cat-{{ category.id }}" {% if post and category in post.categories %}checked{% endif %}>
+            <label for="cat-{{ category.id }}">{{ category.name }}</label><br>
+        {% endfor %}
+        <br>
+
+        <button type="submit">সাবমিট</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>সকল ক্যাটাগরি</h1>
+    <hr>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+        {% for category in categories_pagination.items %}
+            <div style="padding: 10px; border: 1px solid #eee;">
+                <a href="{{ url_for('main.category_posts', category_name=category.name) }}">{{ category.name }} ({{ category.posts.count() }})</a>
+            </div>
+        {% else %}
+            <p>কোনো ক্যাটাগরি পাওয়া যায়নি।</p>
+        {% endfor %}
+    </div>
+    
+    <div class="pagination" style="text-align: center; margin-top: 30px;">
+        {% if categories_pagination.has_prev %}
+            <a href="{{ url_for('main.all_categories', page=categories_pagination.prev_num) }}"><< পূর্ববর্তী</a>
+        {% endif %}
+        | Page {{ categories_pagination.page }} of {{ categories_pagination.pages or 1 }} |
+        {% if categories_pagination.has_next %}
+            <a href="{{ url_for('main.all_categories', page=categories_pagination.next_num) }}">পরবর্তী >></a>
+        {% endif %}
+    </div>
+{% endblock %}

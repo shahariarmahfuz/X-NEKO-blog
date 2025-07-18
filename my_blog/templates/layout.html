@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f43f5e;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --radius: 10px; /* Reduced radius for a tighter look */
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+            --gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            position: relative;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 3px;
+            background: var(--gray-light);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient);
+            width: 0%;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            color: var(--secondary);
+        }
+
+        .mobile-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .mobile-nav .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-light);
+            color: var(--dark);
+            font-size: 16px;
+            position: relative;
+            transition: var(--transition);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .mobile-nav .icon-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            font-size: 10px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Search Overlay */
+        .search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .search-container {
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .search-overlay.active .search-container {
+            transform: translateY(0);
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-header h3 {
+            font-size: 20px;
+            color: var(--dark);
+        }
+
+        .close-search {
+            background: var(--gray-light);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-search:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .search-form {
+            position: relative;
+        }
+
+        .search-form input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border: 2px solid var(--gray-light);
+            border-radius: 50px;
+            font-size: 16px;
+            transition: var(--transition);
+            margin-bottom: 15px;
+        }
+
+        .search-form input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .search-form .fa-search {
+            position: absolute;
+            left: 20px;
+            top: 16px;
+            transform: translateY(0);
+            color: var(--gray);
+            font-size: 20px;
+        }
+
+        .search-form button {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            background: var(--gradient);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .search-form button:hover {
+            opacity: 0.9;
+            box-shadow: var(--shadow);
+        }
+
+        /* --- Sidebar Styles (Modified) --- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            z-index: 1001;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            padding: 15px 10px; /* Reduced padding */
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px 15px 10px; /* Adjusted padding */
+            margin-bottom: 10px; /* Reduced margin */
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .close-sidebar {
+            background: var(--gray-light);
+            border: none;
+            width: 36px; /* Smaller close button */
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-sidebar:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* --- User Profile (Modified for Compact Look) --- */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin: 0 5px 15px 5px; /* Added horizontal margin */
+            background: transparent;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .profile-pic {
+            width: 40px; /* Smaller picture */
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px; /* Adjusted font size for initial */
+            overflow: hidden;
+            flex-shrink: 0; /* Prevents image from shrinking */
+        }
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info h3 {
+            font-size: 15px; /* Smaller font size */
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            color: var(--gray);
+            font-size: 12px; /* Smaller role text */
+        }
+
+        /* --- Sidebar Menu (Modified for Compact Look) --- */
+        .sidebar-menu {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 4px; /* Reduced space between items */
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 9px 15px; /* Reduced padding (height) */
+            border-radius: var(--radius);
+            color: var(--dark);
+            text-decoration: none;
+            transition: var(--transition);
+            gap: 12px;
+            font-size: 15px;
+        }
+
+        .sidebar-menu a:hover, 
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar-menu i {
+            width: 20px; /* Adjusted icon width */
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-categories {
+            margin-top: 15px;
+        }
+
+        .sidebar-categories h4 {
+            font-size: 14px; /* Smaller category title */
+            margin-bottom: 10px;
+            padding: 0 15px;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-list li {
+            margin-bottom: 5px; /* Reduced space */
+        }
+
+        .category-list a {
+            display: block;
+            padding: 8px 15px; /* Reduced padding */
+            border-radius: var(--radius);
+            color: var(--dark);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .category-list a:hover {
+            background: var(--gray-light);
+            color: var(--dark);
+        }
+
+        .category-list a:hover i {
+            color: var(--primary);
+        }
+
+        .category-list i {
+            font-size: 12px;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Flash Message Styles */
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+        .flash {
+            position: relative;
+            padding: 1rem 2.5rem 1rem 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            animation: fadeIn 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .flash-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .flash-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        .flash-info { color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb; }
+        .flash-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+        .close-flash {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            line-height: 1;
+            color: inherit;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        .close-flash:hover {
+            opacity: 1;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: var(--dark);
+            color: var(--gray-light);
+            padding: 60px 20px 20px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col .footer-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .footer-col .footer-logo i {
+            color: var(--secondary);
+            margin-right: 8px;
+        }
+
+        .footer-col p {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .footer-col h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul a {
+            color: var(--gray-light);
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .footer-col ul a:hover {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+
+        .social-icons a:hover { transform: translateY(-3px); }
+        .social-icons a.twitter:hover { background: #1DA1F2; }
+        .social-icons a.facebook:hover { background: #1877F2; }
+        .social-icons a.instagram:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .social-icons a.linkedin:hover { background: #0A66C2; }
+        .social-icons a.github:hover { background: #333; }
+
+        .footer-bottom {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .copyright {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (min-width: 768px) {
+            .header-top { padding: 12px 30px; }
+            .mobile-nav { gap: 20px; }
+            main { padding: 30px; }
+        }
+
+        @media (min-width: 1024px) {
+            .header-top { padding: 14px 40px; }
+        }
+    </style>
+    
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <a href="{{ url_for('main.index') }}" class="logo">
+                <i class="fas fa-paw"></i> My Blog
+            </a>
+
+            <div class="mobile-nav">
+                <div class="icon-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </div>
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('notifications.view_notifications') }}" class="icon-btn">
+                    <i class="fas fa-bell"></i>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+                {% endif %}
+
+                <div class="icon-btn" id="menuBtn">
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            </div>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </header>
+
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-container">
+            <div class="search-header">
+                <h3>Search Posts</h3>
+                <button class="close-search" id="closeSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form action="{{ url_for('main.search') }}" method="get" class="search-form">
+                <i class="fas fa-search"></i>
+                <input type="search" name="q" placeholder="Search for posts..." required>
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        {% if current_user.is_authenticated %}
+        <div class="user-profile">
+            <a href="{{ url_for('main.profile', username=current_user.username) }}" class="profile-pic">
+                {% if current_user.profile_image_url %}
+                    <img src="{{ current_user.profile_image_url }}" alt="Profile Picture">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ current_user.username[0] }}&background=random&color=fff" alt="{{ current_user.username }}">
+                {% endif %}
+            </a>
+            <div class="user-info">
+                <h3>{{ current_user.username }}</h3>
+                <p>{{ current_user.role }}</p>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('main.index') }}" {% if request.endpoint == 'main.index' %}class="active"{% endif %}><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="{{ url_for('main.profile', username=current_user.username) }}" {% if request.endpoint == 'main.profile' %}class="active"{% endif %}><i class="fas fa-user"></i> My Profile</a></li>
+            <li><a href="{{ url_for('notifications.view_notifications') }}" {% if request.endpoint == 'notifications.view_notifications' %}class="active"{% endif %}><i class="fas fa-bell"></i> Notifications</a></li>
+            <li><a href="{{ url_for('main.my_posts') }}" {% if request.endpoint == 'main.my_posts' %}class="active"{% endif %}><i class="fas fa-pen"></i> My Posts</a></li>
+
+            {% if current_user.role == 'Admin' %}
+            <li><a href="{{ url_for('admin.dashboard') }}" {% if request.endpoint == 'admin.dashboard' %}class="active"{% endif %}><i class="fas fa-user-shield"></i> Admin Dashboard</a></li>
+            {% elif current_user.role == 'Moderator' %}
+            <li><a href="{{ url_for('admin.moderator_dashboard') }}" {% if request.endpoint == 'admin.moderator_dashboard' %}class="active"{% endif %}><i class="fas fa-tasks"></i> Moderator Dashboard</a></li>
+            {% endif %}
+
+            <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+        {% else %}
+        <ul class="sidebar-menu">
+            <li><a href="{{ url_for('auth.login') }}" {% if request.endpoint == 'auth.login' %}class="active"{% endif %}><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            <li><a href="{{ url_for('auth.register') }}" {% if request.endpoint == 'auth.register' %}class="active"{% endif %}><i class="fas fa-user-plus"></i> Register</a></li>
+        </ul>
+        {% endif %}
+
+        <div class="sidebar-categories">
+            <h4><i class="fas fa-tags"></i> Categories</h4>
+            <ul class="category-list">
+                {% for category in top_categories %}
+                <li><a href="{{ url_for('main.category_posts', category_name=category.name) }}"><i class="fas fa-hashtag"></i> {{ category.name }}</a></li>
+                {% endfor %}
+                 <li><a href="{{ url_for('main.all_categories') }}" style="font-weight: 500;">সব ক্যাটাগরি দেখুন...</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">
+                    <span>{{ message }}</span>
+                    <button type="button" class="close-flash">&times;</button>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-main">
+                <div class="footer-col">
+                    <a href="{{ url_for('main.index') }}" class="footer-logo"><i class="fas fa-paw"></i>My Blog</a>
+                    <p>Discover the latest articles, tutorials, and insights on technology, design, and development.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                        <li><a href="{{ url_for('main.all_categories') }}">All Categories</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Follow Us</h4>
+                     <div class="social-icons">
+                        <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="github"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">&copy; {{ current_year }} My Blog. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const searchBtn = document.getElementById('searchBtn');
+            const menuBtn = document.getElementById('menuBtn');
+            const closeSearch = document.getElementById('closeSearch');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const searchOverlay = document.getElementById('searchOverlay');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+
+            function toggleBodyScroll(shouldLock) {
+                document.body.style.overflow = shouldLock ? 'hidden' : '';
+            }
+
+            if(searchBtn) {
+                searchBtn.addEventListener('click', () => {
+                    searchOverlay.classList.add('active');
+                    overlay.classList.add('active');
+                    toggleBodyScroll(true);
+                });
+            }
+
+            if(menuBtn) {
+                menuBtn.addEventListener('click', () => {
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                    toggleBodyScroll(true);
+                });
+            }
+
+            function closeAll() {
+                if(searchOverlay) searchOverlay.classList.remove('active');
+                if(sidebar) sidebar.classList.remove('active');
+                if(overlay) overlay.classList.remove('active');
+                toggleBodyScroll(false);
+            }
+
+            if(closeSearch) closeSearch.addEventListener('click', closeAll);
+            if(closeSidebar) closeSidebar.addEventListener('click', closeAll);
+            if(overlay) overlay.addEventListener('click', closeAll);
+
+            function updateProgressBar() {
+                const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+                if (scrollHeight === clientHeight) {
+                    return;
+                }
+                const scrollPercent = (scrollTop / (scrollHeight - clientHeight)) * 100;
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar) {
+                    progressBar.style.width = scrollPercent + '%';
+                }
+            }
+
+            window.addEventListener('scroll', updateProgressBar);
+
+            // JavaScript for dismissing flash messages
+            document.querySelectorAll('.close-flash').forEach(button => {
+                button.addEventListener('click', function() {
+                    const flashMessage = this.parentElement;
+                    flashMessage.style.transition = 'opacity 0.5s ease';
+                    flashMessage.style.opacity = '0';
+                    setTimeout(() => {
+                        flashMessage.style.display = 'none';
+                    }, 500);
+                });
+            });
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

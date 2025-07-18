@@ -1,0 +1,236 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+    /* Custom styles for the form to match the layout better */
+    .post-form {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+    }
+    .post-form h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        color: var(--dark);
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 10px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--dark);
+    }
+    .form-group input[type="text"],
+    .form-group select,
+    .form-group input[type="file"],
+    .form-group input[type="datetime-local"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--gray-light);
+        border-radius: var(--radius);
+        font-size: 16px;
+        transition: var(--transition);
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    .thumbnail-preview {
+        max-width: 200px;
+        height: auto;
+        border: 1px solid var(--gray-light);
+        padding: 5px;
+        border-radius: var(--radius);
+        margin-top: 10px;
+    }
+    .publish-options {
+        background-color: #f8fafc;
+        padding: 20px;
+        border-radius: var(--radius);
+        border: 1px solid var(--gray-light);
+        margin-top: 20px;
+    }
+    .publish-options h3 {
+        margin-bottom: 15px;
+    }
+    .publish-options label {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 20px;
+        cursor: pointer;
+    }
+    .publish-options input[type="radio"] {
+        margin-right: 8px;
+    }
+    .submit-btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        background: var(--gradient);
+        color: white;
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+    }
+    .submit-btn:hover {
+        opacity: 0.9;
+        box-shadow: var(--shadow);
+    }
+    /* Ensure tox container is not affected by other styles */
+    .tox-tinymce {
+        border-radius: var(--radius) !important;
+    }
+</style>
+
+<div class="post-form">
+    <h1>{% if post and post.id %}Edit Post{% else %}Create New Post{% endif %}</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" value="{{ post.title if post else 'নতুন শিরোনাম' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select name="category" id="category">
+                <option value="">-- Select Category --</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if post and post.categories and cat in post.categories %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="tags">Tags (comma separated, e.g., blogging, writing):</label>
+            <input type="text" id="tags" name="tags" value="{{ tags_str if tags_str else '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="thumbnail">Thumbnail Image:</label>
+            {% if post and post.thumbnail_url and post.thumbnail_url != 'default_thumbnail.png' %}
+                <img src="{{ post.thumbnail_url }}" alt="Thumbnail" class="thumbnail-preview"><br>
+                <small>Change Thumbnail:</small><br>
+            {% endif %}
+            <input type="file" id="thumbnail" name="thumbnail" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Content:</label>
+            <textarea name="content" id="content" rows="25">{{ post.content if post else '' }}</textarea>
+        </div>
+
+        <div class="publish-options">
+            <h3>Publish Options</h3>
+            <div>
+                <label>
+                    <input type="radio" name="publish_option" value="draft" {% if not post or post.status == 'draft' %}checked{% endif %}>
+                    Save as Draft
+                </label>
+            </div>
+            <div style="margin-top: 10px;">
+                <label>
+                    <input type="radio" name="publish_option" value="publish" {% if post and post.status in ['pending', 'published'] %}checked{% endif %}>
+                    Publish (Submit for Review)
+                </label>
+            </div>
+            <div style="margin-top: 10px;">
+                <label>
+                    <input type="radio" id="schedule" name="publish_option" value="schedule" {% if post and post.scheduled_for %}checked{% endif %}>
+                    Schedule for Later:
+                </label>
+                <input type="datetime-local" name="schedule_time" value="{{ post.scheduled_for.strftime('%Y-%m-%dT%H:%M') if post and post.scheduled_for else '' }}" style="display: inline-block; width: auto; margin-left: 10px;">
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Save Changes</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.tiny.cloud/1/xj1948mluqta1b4ooznz0l1hklg1fny9s2rxe6h1el5kpx6x/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    tinymce.init({
+        selector: '#content',
+        plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+        menubar: 'file edit view insert format tools table help',
+        toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+        toolbar_sticky: true,
+        autosave_ask_before_unload: true,
+        autosave_interval: '30s',
+        autosave_prefix: '{path}{query}-{id}-',
+        autosave_restore_when_empty: false,
+        autosave_retention: '2m',
+        image_advtab: true,
+        link_list: [
+            { title: 'My page 1', value: 'https://www.tiny.cloud' },
+            { title: 'My page 2', value: 'http://www.moxiecode.com' }
+        ],
+        image_list: [
+            { title: 'My page 1', value: 'https://www.tiny.cloud' },
+            { title: 'My page 2', value: 'http://www.moxiecode.com' }
+        ],
+        image_class_list: [
+            { title: 'None', value: '' },
+            { title: 'Some class', value: 'class-name' }
+        ],
+        importcss_append: true,
+        file_picker_callback: (callback, value, meta) => {
+            /* Provide file and image handling logic here */
+            if (meta.filetype === 'file') {
+                callback('https://www.google.com/logos/google.jpg', { text: 'My text' });
+            }
+            if (meta.filetype === 'image') {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.onchange = () => {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const id = 'blobid' + (new Date()).getTime();
+                        const blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                        const base64 = reader.result.split(',')[1];
+                        const blobInfo = blobCache.create(id, file, base64);
+                        blobCache.add(blobInfo);
+                        callback(blobInfo.blobUri(), { title: file.name });
+                    };
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            }
+            if (meta.filetype === 'media') {
+                callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
+            }
+        },
+        height: 600,
+        image_caption: true,
+        quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+        noneditable_class: 'mceNonEditable',
+        toolbar_mode: 'sliding',
+        contextmenu: 'link image table',
+        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+        // Mobile-specific configuration
+        mobile: {
+            plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+            menubar: true,
+            toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image codesample'
+        }
+    });
+});
+</script>
+{% endblock %}

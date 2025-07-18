@@ -1,0 +1,334 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    /* New design styles that won't conflict with layout.html */
+
+    .container-new { /* Using a new class name to avoid conflicts */
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0; 
+    }
+
+    /* Section Title Styles */
+    .section-title {
+        font-family: 'Inter', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 20px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--primary);
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .section-title i {
+        margin-right: 10px;
+        color: var(--primary);
+        background: rgba(99, 102, 241, 0.1); /* Using color from layout.html */
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Grid container for the cards */
+    .post-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    /* Main card styles */
+    .card-link {
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .card-link:hover {
+        transform: translateY(-4px);
+    }
+
+    .card {
+        display: flex;
+        background: #fff;
+        border-radius: var(--radius, 10px);
+        overflow: hidden;
+        height: 95px;
+        position: relative;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-light);
+    }
+
+    .card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .card img {
+        width: 110px;
+        flex-shrink: 0;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover img {
+        transform: scale(1.05);
+    }
+
+    .card-content {
+        padding: 6px 12px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .card-content h4 {
+        margin: 0 0 3px 0;
+        font-size: 14px;
+        line-height: 1.3;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--dark);
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .card:hover .card-content h4 {
+        color: var(--primary);
+    }
+
+    .card-content .description {
+        margin: 0 0 5px 0;
+        font-size: 12px;
+        color: var(--gray);
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .meta-info {
+        font-size: 11px;
+        color: var(--gray);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .meta-info i {
+        margin-right: 4px;
+        font-size: 10px;
+        color: var(--primary);
+    }
+
+    .meta-separator {
+        margin: 0 5px;
+        color: var(--gray-light);
+    }
+
+    /* Badge Styles */
+    .card-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        line-height: 1;
+        z-index: 2;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .card:hover .card-badge {
+        transform: scale(1.1);
+    }
+
+    .badge-icon {
+        font-size: 10px;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .badge-new {
+        font-size: 10px;
+        padding: 4px 7px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #00b894, #00cec9);
+    }
+
+    .badge-hot { 
+        background: linear-gradient(135deg, #ff6b6b, var(--secondary)); /* Adjusted to use layout secondary color */
+    }
+
+    .badge-best { 
+        background: linear-gradient(135deg, #fdcb6e, #fbc531); 
+    }
+
+    /* Pagination Styles */
+    .pagination {
+        text-align: center;
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pagination a, .pagination span {
+        font-family: 'Inter', sans-serif;
+        color: var(--primary);
+        padding: 8px 15px;
+        text-decoration: none;
+        border: 1px solid var(--gray-light);
+        border-radius: var(--radius, 10px);
+        transition: all 0.3s ease;
+        font-weight: 600;
+        min-width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pagination a:hover, .pagination a.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .pagination i {
+        font-size: 12px;
+    }
+
+    .pagination span {
+        background: #f0f0f0;
+        color: #aaa;
+        border-color: #e0e0e0;
+    }
+
+    hr.divider {
+        margin: 40px 0;
+        border: 0;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0) 0%, var(--primary) 50%, rgba(99, 102, 241, 0) 100%);
+    }
+</style>
+
+<div class="container-new">
+    <div class="content">
+        {% if trending_posts %}
+        <h2 class="section-title"><i class="fas fa-fire"></i>Trending Posts</h2>
+        <div class="post-list">
+            {% for post in trending_posts %}
+            <a href="{{ url_for('main.post', slug=post.slug) }}" class="card-link">
+                <div class="card">
+                    <div class="card-badge badge-icon badge-hot"><i class="fas fa-fire"></i></div>
+                    <img src="{{ post.thumbnail_url }}" alt="{{ post.title }}">
+                    <div class="card-content">
+                        <h4>{{ post.title }}</h4>
+                        <p class="description">{{ post.content | striptags | truncate(80, True) }}</p>
+                        <div class="meta-info">
+                            <i class="fas fa-pen-alt"></i>By {{ post.author.username }}<span class="meta-separator">|</span><i class="fas fa-thumbs-up"></i>{{ post.likes.count() }} Likes
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <hr class="divider">
+        {% endif %}
+
+        {% if best_posts %}
+        <h2 class="section-title"><i class="fas fa-crown"></i>All-Time Best</h2>
+        <div class="post-list">
+            {% for post in best_posts %}
+            <a href="{{ url_for('main.post', slug=post.slug) }}" class="card-link">
+                <div class="card">
+                    <div class="card-badge badge-icon badge-best"><i class="fas fa-crown"></i></div>
+                    <img src="{{ post.thumbnail_url }}" alt="{{ post.title }}">
+                    <div class="card-content">
+                        <h4>{{ post.title }}</h4>
+                        <p class="description">{{ post.content | striptags | truncate(80, True) }}</p>
+                        <div class="meta-info">
+                           <i class="fas fa-pen-alt"></i>By {{ post.author.username }}<span class="meta-separator">|</span><i class="fas fa-star"></i>Score: {{ post.popularity_score }}
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <hr class="divider">
+        {% endif %}
+
+        {% if posts_pagination.items %}
+        <h2 class="section-title"><i class="fas fa-clock-rotate-left"></i>Recent Posts</h2>
+        <div class="post-list">
+            {% for post in posts_pagination.items %}
+            <a href="{{ url_for('main.post', slug=post.slug) }}" class="card-link">
+                <div class="card">
+
+                    {# --- এইখানে পরিবর্তন করা হয়েছে --- #}
+                    {% if loop.index <= 3 %}
+                    <div class="card-badge badge-new">New</div>
+                    {% endif %}
+
+                    <img src="{{ post.thumbnail_url }}" alt="{{ post.title }}">
+                    <div class="card-content">
+                        <h4>{{ post.title }}</h4>
+                        <p class="description">{{ post.content | striptags | truncate(80, True) }}</p>
+                        <div class="meta-info">
+                            <i class="fas fa-pen-alt"></i>By {{ post.author.username }}<span class="meta-separator">|</span><i class="fas fa-calendar-alt"></i>{{ post.created_at.strftime('%d-%b-%Y') }}
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if posts_pagination and posts_pagination.pages > 1 %}
+        <div class="pagination">
+            {% if posts_pagination.has_prev %}
+                <a href="{{ url_for('main.index', page=posts_pagination.prev_num) }}"><i class="fas fa-chevron-left"></i> Previous</a>
+            {% endif %}
+            {% for page_num in posts_pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    <a href="{{ url_for('main.index', page=page_num) }}" class="{{ 'active' if page_num == posts_pagination.page else '' }}">{{ page_num }}</a>
+                {% else %}
+                    <span>...</span>
+                {% endif %}
+            {% endfor %}
+            {% if posts_pagination.has_next %}
+                <a href="{{ url_for('main.index', page=posts_pagination.next_num) }}">Next <i class="fas fa-chevron-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

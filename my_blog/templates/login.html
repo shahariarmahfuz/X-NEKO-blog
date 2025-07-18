@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+    /* Form Wrapper Styles */
+    .form-wrapper {
+        max-width: 450px;
+        margin: 40px auto;
+        padding: 30px 40px;
+        background: #ffffff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border-top: 5px solid var(--primary);
+        text-align: center; /* Center align content */
+    }
+
+    .form-wrapper h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: var(--dark);
+    }
+
+    /* Form Group for better spacing */
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left; /* Align labels and inputs to the left */
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--dark);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"] {
+        width: 100%;
+        padding: 12px 18px;
+        font-size: 16px;
+        border: 2px solid var(--gray-light);
+        border-radius: var(--radius);
+        transition: var(--transition);
+        background-color: var(--light);
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group input[type="password"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Remember Me Checkbox styling */
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 25px;
+        justify-content: flex-start; /* Align to the left */
+    }
+
+    .remember-me input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary); /* Modern way to color checkboxes */
+        cursor: pointer;
+    }
+
+    .remember-me label {
+        font-size: 15px;
+        color: var(--gray);
+        cursor: pointer;
+    }
+
+    /* Button Styles */
+    .button {
+        display: block;
+        width: 100%;
+        padding: 14px 20px;
+        border: none;
+        background: var(--gradient);
+        color: white;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .button:hover {
+        opacity: 0.9;
+        box-shadow: var(--shadow);
+    }
+
+    /* Bottom Link Style */
+    .bottom-link {
+        margin-top: 25px;
+        font-size: 15px;
+        color: var(--gray);
+    }
+
+    .bottom-link a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .bottom-link a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+</style>
+
+<div class="form-wrapper">
+    <h1>Login to Your Account</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <div class="remember-me">
+            <input type="checkbox" id="remember" name="remember">
+            <label for="remember">Remember me (30 days)</label>
+        </div>
+
+        <button type="submit" class="button">Login</button>
+    </form>
+
+    <div class="bottom-link">
+        Don't have an account? <a href="/auth/register">Sign Up</a>
+    </div>
+</div>
+{% endblock %}

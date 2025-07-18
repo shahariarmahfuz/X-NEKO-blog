@@ -1,0 +1,188 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background for the page */
+    }
+
+    .notifications-container {
+        max-width: 750px;
+        margin: 40px auto;
+        font-family: 'Hind Siliguri', sans-serif; /* Professional Bengali font */
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .notifications-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .notifications-header h1 {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50; /* Darker, more professional color */
+        margin: 0;
+    }
+
+    .mark-all-read-btn {
+        background-color: transparent;
+        color: #3498db; /* Blue text color */
+        border: 1px solid #3498db;
+        padding: 8px 16px;
+        border-radius: 20px; /* Pill-shaped button */
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .mark-all-read-btn:hover {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .notification-card {
+        display: flex;
+        align-items: flex-start; /* Align items to the top */
+        background-color: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 12px; /* Softer border radius */
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+    }
+
+    .notification-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .notification-card.unread {
+        background-color: #fdfdff; /* A very light blue */
+        border-left: 4px solid #5d9cec; /* A gentle blue accent */
+    }
+
+    .notification-icon {
+        font-size: 22px;
+        margin-right: 20px;
+        margin-top: 3px;
+        width: 35px;
+        height: 35px;
+        line-height: 35px;
+        border-radius: 50%;
+        text-align: center;
+        background-color: #f1f3f5;
+        color: #555;
+    }
+
+    .notification-content {
+        flex-grow: 1;
+    }
+
+    .notification-content p {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 16px;
+        color: #34495e; /* Slightly softer text color */
+    }
+
+    .notification-content a {
+        text-decoration: none;
+        color: #2980b9;
+        font-weight: 600;
+    }
+
+    .notification-content a:hover {
+        text-decoration: underline;
+    }
+
+    .notification-time {
+        font-size: 13px;
+        color: #95a5a6; /* Softer gray for time */
+        margin-top: 6px;
+    }
+
+    .no-notifications {
+        text-align: center;
+        padding: 60px 40px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        color: #7f8c8d;
+    }
+
+    .no-notifications i {
+        font-size: 52px;
+        margin-bottom: 20px;
+        color: #bdc3c7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notifications-container">
+    <div class="notifications-header">
+        <h1>নোটিফিকেশনস</h1>
+        {% if notifications %}
+            <button class="mark-all-read-btn" onclick="alert('Marking all as read!');">সবগুলো পঠিত করুন</button>
+        {% endif %}
+    </div>
+    <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 25px;">
+
+    {% if notifications %}
+        {% for notification in notifications %}
+            <div class="notification-card {% if not notification.is_read %}unread{% endif %}">
+
+                <div class="notification-icon">
+                    {% if notification.type == 'like' %}
+                        <i class="fas fa-heart" style="color: #e74c3c;"></i>
+                    {% elif notification.type == 'comment' %}
+                        <i class="fas fa-comment-dots" style="color: #f39c12;"></i>
+                    {% elif notification.link %}
+                        <i class="fas fa-link" style="color: #3498db;"></i>
+                    {% else %}
+                        <i class="fas fa-bell" style="color: #2ecc71;"></i>
+                    {% endif %}
+                </div>
+
+                <div class="notification-content">
+                    <p>
+                        {% if notification.link %}
+                            <a href="{{ notification.link }}">{{ notification.message }}</a>
+                        {% else %}
+                            {{ notification.message }}
+                        {% endif %}
+                    </p>
+                    <div class="notification-time">{{ notification.created_at.strftime('%d %B, %Y %I:%M %p') }}</div>
+                </div>
+
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-notifications">
+            <i class="far fa-bell-slash"></i>
+            <p>আপনার কোনো নোটিফিকেশন নেই।</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>মডারেটর ড্যাশবোর্ড</h1>
+    <h2>অনুমোদনের জন্য অপেক্ষারত পোস্টসমূহ</h2>
+
+    {% if posts %}
+        <table border="1" style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="padding: 8px;">শিরোনাম</th>
+                    <th style="padding: 8px;">লেখক</th>
+                    <th style="padding: 8px;">তারিখ</th>
+                    <th style="padding: 8px;">অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                <tr>
+                    <td style="padding: 8px;">{{ post.title }}</td>
+                    <td style="padding: 8px;">{{ post.author.username }}</td>
+                    <td style="padding: 8px;">{{ post.created_at.strftime('%d-%b-%Y') }}</td>
+                    <td style="padding: 8px; display: flex; gap: 5px;">
+                        <a href="{{ url_for('admin.preview_post', post_id=post.id) }}" class="button" target="_blank">পূর্বরূপ</a>
+                        <a href="{{ url_for('admin.approve_post', post_id=post.id) }}" class="button" style="background-color: #28a745; color: white;">অ্যাপ্রুভ</a>
+                        <details>
+                            <summary class="button" style="background-color: #dc3545; color: white;">রিজেক্ট</summary>
+                            <form action="{{ url_for('admin.reject_post', post_id=post.id) }}" method="post" style="padding:5px; border:1px solid #ccc; margin-top: 5px; position:absolute; background:white; z-index:10;">
+                                <textarea name="reason" placeholder="রিজেক্ট করার কারণ..." required rows="2"></textarea><br>
+                                <button type="submit" class="button button-primary">নিশ্চিত করুন</button>
+                            </form>
+                        </details>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>এখন কোনো পোস্ট পেন্ডিং নেই।</p>
+    {% endif %}
+{% endblock %}
