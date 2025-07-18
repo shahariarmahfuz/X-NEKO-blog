@@ -373,73 +373,76 @@
                 <p>অনুগ্রহ করে মন্তব্য করার জন্য <a href="{{ url_for('auth.login') }}">লগইন</a> করুন।</p>
             {% endif %}
 
-            <h4>সকল মন্তব্য ({{ comments | length }})</h4>
+            <h4>সকল মন্তব্য ({{ post.comments.filter_by(is_hidden_by_ban=False).count() }})</h4>
             <div id="comment-thread" class="comment-thread">
-            {% for comment in comments recursive %}
-                <div class="comment" id="comment-{{ comment.id }}">
-                    <div class="comment-header">
-                        <a href="{{ url_for('main.profile', username=comment.commenter.username) }}">
-                        {% if comment.commenter.profile_image_url %}
-                            <img src="{{ comment.commenter.profile_image_url }}" alt="{{ comment.commenter.username }}" class="profile-pic-small">
-                        {% else %}
-                            <img src="https://ui-avatars.com/api/?name={{ comment.commenter.username[0] | urlencode }}&background=random&color=fff&size=32" alt="{{ comment.commenter.username }}" class="profile-pic-small">
-                        {% endif %}
-                        </a>
-                        <strong>{{ comment.commenter.username }}</strong>
-                        {% if comment.commenter.role in ['Admin', 'Moderator'] %}
-                            <span class="admin-badge" style="font-size: 9px; padding: 2px 6px;">✔ {{ comment.commenter.role }}</span>
-                        {% endif %}
-                        <small style="color:var(--gray)">({{ comment.created_at.strftime('%d-%b-%Y') }})</small>
-                    </div>
-                    <p>{{ comment.text }}</p>
+                {% if comments %}
+                    {% for comment in comments recursive %}
+                        <div class="comment" id="comment-{{ comment.id }}">
+                            <div class="comment-header">
+                                <a href="{{ url_for('main.profile', username=comment.commenter.username) }}">
+                                {% if comment.commenter.profile_image_url %}
+                                    <img src="{{ comment.commenter.profile_image_url }}" alt="{{ comment.commenter.username }}" class="profile-pic-small">
+                                {% else %}
+                                    <img src="https://ui-avatars.com/api/?name={{ comment.commenter.username[0] | urlencode }}&background=random&color=fff&size=32" alt="{{ comment.commenter.username }}" class="profile-pic-small">
+                                {% endif %}
+                                </a>
+                                <strong>{{ comment.commenter.username }}</strong>
+                                {% if comment.commenter.role in ['Admin', 'Moderator'] %}
+                                    <span class="admin-badge" style="font-size: 9px; padding: 2px 6px;">✔ {{ comment.commenter.role }}</span>
+                                {% endif %}
+                                <small style="color:var(--gray)">({{ comment.created_at.strftime('%d-%b-%Y') }})</small>
+                            </div>
+                            <p>{{ comment.text }}</p>
 
-                    {% if current_user.is_authenticated %}
-                    <div class="comment-actions">
-                        {% if not current_user.is_banned %}
-                        <details>
-                            <summary class="button">উত্তর দিন</summary>
-                                <div class="details-form-container">
-                                    <h4>উত্তর দিন</h4>
-                                    <form action="{{ url_for('main.add_comment', post_id=post.id) }}" method="post">
-                                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                                        <textarea name="comment_text" rows="2" required placeholder="রিপ্লাই লিখুন..."></textarea>
-                                        <button type="submit" class="button button-primary">পোস্ট করুন</button>
-                                    </form>
-                                </div>
-                        </details>
-                        {% endif %}
+                            {% if current_user.is_authenticated %}
+                            <div class="comment-actions">
+                                {% if not current_user.is_banned %}
+                                <details>
+                                    <summary class="button">উত্তর দিন</summary>
+                                        <div class="details-form-container">
+                                            <h4>উত্তর দিন</h4>
+                                            <form action="{{ url_for('main.add_comment', post_id=post.id) }}" method="post">
+                                                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                                <textarea name="comment_text" rows="2" required placeholder="রিপ্লাই লিখুন..."></textarea>
+                                                <button type="submit" class="button button-primary">পোস্ট করুন</button>
+                                            </form>
+                                        </div>
+                                </details>
+                                {% endif %}
 
-                        {% if current_user != comment.commenter %}
-                        <details>
-                            <summary class="button">রিপোর্ট</summary>
-                                <div class="details-form-container">
-                                    <h4>মন্তব্য রিপোর্ট করুন</h4>
-                                    <form action="{{ url_for('main.submit_report') }}" method="post">
-                                        <input type="hidden" name="comment_id" value="{{ comment.id }}">
-                                        <textarea name="reason" placeholder="রিপোর্টের কারণ..." required rows="2"></textarea>
-                                        <button type="submit" class="button button-primary">সাবমিট</button>
-                                    </form>
-                                </div>
-                        </details>
-                        {% endif %}
+                                {% if current_user != comment.commenter %}
+                                <details>
+                                    <summary class="button">রিপোর্ট</summary>
+                                        <div class="details-form-container">
+                                            <h4>মন্তব্য রিপোর্ট করুন</h4>
+                                            <form action="{{ url_for('main.submit_report') }}" method="post">
+                                                <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                                                <textarea name="reason" placeholder="রিপোর্টের কারণ..." required rows="2"></textarea>
+                                                <button type="submit" class="button button-primary">সাবমিট</button>
+                                            </form>
+                                        </div>
+                                </details>
+                                {% endif %}
 
-                        {% if current_user.role == 'Admin' %}
-                        <form action="{{ url_for('admin.delete_comment', comment_id=comment.id) }}" method="post" onsubmit="return confirm('আপনি কি এই মন্তব্যটি মুছে ফেলতে চান?')">
-                            <button type="submit" class="button button-danger">মুছুন</button>
-                        </form>
-                        {% endif %}
-                    </div>
-                    {% endif %}
+                                {% if current_user.role == 'Admin' %}
+                                <form action="{{ url_for('admin.delete_comment', comment_id=comment.id) }}" method="post" onsubmit="return confirm('আপনি কি এই মন্তব্যটি মুছে ফেলতে চান?')">
+                                    <button type="submit" class="button button-danger">মুছুন</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            {% endif %}
 
-                    {% if comment.replies %}
-                    <div class="comment-replies">
-                        {{ loop(comment.replies.filter_by(is_hidden_by_ban=False).order_by('created_at')) }}
-                    </div>
-                    {% endif %}
-                </div>
-            {% else %}
-                <p>এখনো কোনো মন্তব্য করা হয়নি। প্রথম মন্তব্যটি আপনি করুন!</p>
-            {% endfor %}
+                            {% set replies = comment.replies.filter_by(is_hidden_by_ban=False).order_by('created_at').all() %}
+                            {% if replies %}
+                            <div class="comment-replies">
+                                {{ loop(replies) }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>এখনো কোনো মন্তব্য করা হয়নি। প্রথম মন্তব্যটি আপনি করুন!</p>
+                {% endif %}
             </div>
         </section>
         {% endif %}
